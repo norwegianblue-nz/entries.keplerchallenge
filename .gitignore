@@ -1,0 +1,45 @@
+#Ignore symlinks at root
+/htdocs
+/simplesamlphp
+
+# Ignore Drupal installed stuff
+/drupal-7*/authorize.php
+/drupal-7*/CHANGELOG.txt
+/drupal-7*/COPYRIGHT.txt
+/drupal-7*/cron.php
+/drupal-7*/includes/
+/drupal-7*/index.php
+/drupal-7*/INSTALL.mysql.txt
+/drupal-7*/INSTALL.pgsql.txt
+/drupal-7*/install.php
+/drupal-7*/INSTALL.sqlite.txt
+/drupal-7*/INSTALL.txt
+/drupal-7*/LICENSE.txt
+/drupal-7*/MAINTAINERS.txt
+/drupal-7*/misc/
+/drupal-7*/modules/
+/drupal-7*/profiles/
+/drupal-7*/README.txt
+/drupal-7*/robots.txt
+/drupal-7*/scripts/
+/drupal-7*/themes/
+/drupal-7*/update.php
+/drupal-7*/UPGRADE.txt
+/drupal-7*/web.config
+/drupal-7*/xmlrpc.php
+
+# Ignore default sites stuff
+/drupal-7*/sites/default/
+/drupal-7*/sites/example.sites.php
+/drupal-7*/sites/README.txt
+/drupal-7*/sites/all/themes/
+
+# settings.php - always ignored as sensitive data in here.
+/drupal-7*/sites/*/settings.php
+
+# Ignore Drupal's file directory
+/drupal-7*/sites/*/files/
+
+# Ignore SimplSAMLphp config files
+simplesamlphp*/config
+simplesamlphp*/metadata
