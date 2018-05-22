@@ -1,0 +1,10 @@
+################################################################################
+##                                                                            ##
+##  Kepler Challenge Entries System                                           ##
+##                                                                            ##
+################################################################################
+##
+## NOTE. Due to an error in paths yet to be traced, the drupal directory is
+##       left named as drupal-7.57, even though drupal core has been upgraded
+##       to the most recent version
+##
