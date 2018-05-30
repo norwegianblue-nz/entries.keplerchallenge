@@ -8,3 +8,16 @@
 ##       left named as drupal-7.57, even though drupal core has been upgraded
 ##       to the most recent version
 ##
+##
+## 2018-05-30
+## Patches:
+## Started a new concept of creating patch files via Netbeans in the vhost's 
+## directory.
+## Patches found here should be applied after modules are updated (these patches
+##  minor 'tweaks' to std modules)
+##
+## Patches to be applied
+## ---------------------
+## module_phone-7.x-1.0-beta1_err-msg.patch
+##
+## ---------------------
