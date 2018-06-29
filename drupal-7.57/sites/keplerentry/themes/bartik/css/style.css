@@ -1238,7 +1238,7 @@ select.form-select {
 }
 input.form-submit:hover,
 input.form-submit:focus {
-  background: #dedede;
+  background: #BB4400;
 }
 .password-suggestions ul li {
   margin-left: 1.2em; /* LTR */
@@ -1790,13 +1790,18 @@ input.form-submit, a.button, #user-login-form > div a, /* line 1087 and others *
 /* End of editable fields view styling */
 
 .cart-message a {display:block; width:200px;} /* Cart logout button */
-.cart-message a:hover {background-color:#dedede;}
+.cart-message a:hover {background-color:#BB4400;}
 
 a.button:link, a.button:visited, a.button:focus, a.button:active, /* line 1107 */
 .cart-message a:link, .cart-message a:visited, .cart-message a:focus, .cart-message a:active /* line 1765 */
 {	color: #fff;}
+/* Hidden Checkout button for entry day */
+#views-form-commerce-cart-form-default #edit-actions {display: none;}
+.cart-message a.checkout-disabled, .cart-message a.checkout-disabled:hover {background-color: #dedede;}
+.cart-message a.checkout-disabled:hover {background-color: #dedede;}
+.cart-message a.checkout-disabled:hover::after {content:"disabled until tomorrow";display: inline-block;}
 
-a.button:hover, #user-login-form > div a:hover  {color:#ccc;} /* new - relates to line 1107 */
+a.button:hover, #user-login-form > div a:hover  {color:#BB4400;} /* new - relates to line 1107 */
 
 /* 'Entry Forms' button in menu-bar */
 #block-menu-menu-menu1 { /* Float menu left to allow for Entry button */
@@ -1826,12 +1831,15 @@ a.button:hover, #user-login-form > div a:hover  {color:#ccc;} /* new - relates t
 .line-item-summary-checkout a:link, .line-item-summary-checkout a:visited, .line-item-summary-checkout a:active
 {color:#fff;}
 .line-item-summary-view-cart a:hover, .line-item-summary-checkout a:hover
-{color:#ccc;}
+{color:#BB4400;}
 
 form#views-form-user-cart-mycart div.line-item-summary ul.links.inline {display:block;} /* Targets line 46 */
 .line-item-summary .links { /* Line 23 of commerce_line_item.theme.css */
     margin-top: 1.5em;
 }
+
+
+
 /* /end/ cart and checkout links */
 
 h1#page-title { /* line 572 */
@@ -1991,6 +1999,14 @@ p.iframe-alert { /* New */
     padding: 2em 1em;
     margin-bottom:0;
 }
+
+/* My Entry screen of registration - hide extra info not required beside buttons  */
+div.entity-registration > div.content > div:first-of-type, div.entity-registration > div.content > div:nth-of-type(2) {
+	display: none;
+}
+.field.field-name-field-sponsor.field-type-text.field-label-hidden {
+	clear: left;	width: auto;
+} /* re-aligns sponsor and event name */
 
 /* Page layout */
 #page-wrapper { /* line 9 of layout.css */ /*===* Need to decide on narrowest width allowed *===*/

@@ -1,0 +1,101 @@
+
+/*
+    Created on : 30/05/2018, 10:35:45 AM
+    Author     : roo
+*/
+/* @import url(https://fonts.googleapis.com/css?family=Ubuntu:400,400italic); */
+
+
+/* body {
+  line-height: 1.5;
+  background-image: url("http://scud.keplerchallenge.co.nz/sites/keplerchallenge.co.nz/files/2018-03/KeplerTrack-bg_2.png");
+} */
+
+/* Edited TMD 29/6/2018 */
+body {}
+table {border-collapse:separate;}
+a, a:link, a:visited {text-decoration: none; color: #00788a;}
+a:hover {text-decoration: underline;}
+h2,h2 a,h2 a:visited,h3,h3 a,h3 a:visited,h4,h5,h6,.t_cht {color:#000 !important;}
+.ExternalClass p, .ExternalClass span, .ExternalClass font, .ExternalClass td {line-height: 100%;}
+.ExternalClass {width: 100%;}
+
+html {
+  margin: 0;
+  padding: 0;
+}
+body {
+  margin: 0;
+  padding: 0;
+  -webkit-text-size-adjust: 100%;
+  background-color:#f0f0f0;
+  font-family:Ubuntu,sans-serif;
+}
+.wrapper {
+  min-width: 320px;
+  width: 100%;
+  margin-bottom:50px;
+}
+table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width:100%;
+}
+* {
+  line-height: inherit;
+}
+[x-apple-data-detectors],
+[href^="tel"],
+[href^="sms"] {
+  color: inherit !important;
+  text-decoration: none !important;
+}
+#email-header {
+  font-size: 2rem;
+}
+.content {
+  background-color: #FFF;
+  padding: 20px;
+  color:#787778;
+  font-size:16px;
+  line-height: 24px;
+}
+.layout {
+  margin: 0 auto;
+  max-width: 600px;
+  min-width: 320px;
+  width:400px;
+  -fallback-width: 320px;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+.wrapper h1, .wrapper h2, .wrapper h3 {
+  font-style: normal;
+  font-weight: normal;
+  font-family:Ubuntu,sans-serif;
+  mso-line-height-rule:exactly;
+}
+.wrapper h1 {
+  color: #565656;
+  line-height: 35px;
+  margin: 10px 0 60px;
+}
+h2, h3 {margin: 35px 0 16px 0;}
+a.button {
+  color: #ffffff !important;
+  font-family: Ubuntu, sans-serif;
+  border-radius: 4px;
+  background-color:#993300;
+  padding: 20px;
+  text-align: center;
+  text-decoration: none;
+}
+
+
+@media only screen and (min-width: 620px) {
+  .layout{width:600px;}
+}
+@media (max-width: 321px) {
+  .layout{width:320px;}
+}

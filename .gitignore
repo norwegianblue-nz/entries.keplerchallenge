@@ -43,3 +43,6 @@
 # Ignore SimplSAMLphp config files
 simplesamlphp*/config
 simplesamlphp*/metadata
+
+# Ignore safe copies
+*SAFE

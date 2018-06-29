@@ -216,7 +216,7 @@ function registration_commerce_entity_view($entity, $type, $view_mode, $langcode
         $entity->content['price'] = array(
           '#theme' => 'registration_property_field',
           '#weight' => $extra['price']['display'][$view_mode]['weight'],
-          '#label' => t('Price'),
+          '#label' => t('Entry Price'),
           '#items' => array(
             array(
               '#markup' => $price_markup,
@@ -252,7 +252,7 @@ function registration_commerce_entity_view($entity, $type, $view_mode, $langcode
           $entity->content['pay_link'] = array(
             '#weight' => $extra['pay_link']['display'][$view_mode]['weight'],
             '#markup' => l($link_text, $uri['path'] . '/pay', array(
-              'attributes' => array('classes' => array('button')),
+              'attributes' => array('class' => array('button')),
             )),
           );
         }
