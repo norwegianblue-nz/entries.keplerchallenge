@@ -394,7 +394,7 @@ function registration_commerce_pay_callback($registration) {
     // A duplicate has been found, get the Cart ID to add to the status message:
     $first_result = array_shift($result['commerce_line_item']);
     $extant_line_item = commerce_line_item_load($first_result->line_item_id);
-    drupal_set_message(t('Unable to add this registration to your cart because it is in another cart with an Order ID of @cart_id.', array('@cart_id' => $extant_line_item->order_id)), 'status');
+    drupal_set_message(t('Unable to add this registration to your cart because it is already in a cart with an Order ID of @cart_id.', array('@cart_id' => $extant_line_item->order_id)), 'status');
   }
   // Now we try to add the item to the cart:
   elseif (!registration_commerce_add_to_cart($registration)) {
