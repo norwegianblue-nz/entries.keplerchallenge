@@ -110,17 +110,42 @@ function commerce_stripe_libraries_info() {
 function commerce_stripe_libraries_postload_callback($library, $version = NULL, $variant = NULL) {
   if (!empty($library['loaded'])) {
     // @todo: Make this a global configuration, since merchants will only have one API key.
+
     $payment_method = commerce_payment_method_instance_load('commerce_stripe|commerce_payment_commerce_stripe');
-    \Stripe\Stripe::setApiKey(trim($payment_method['settings']['secret_key']));
+
+    $settings = $payment_method['settings'];
+
+    // If the site is using the Commerce Stripe Connect submodule and the
+    // payment method is configured to use a site-wide connected account, swap
+    // in its secret and public key now.
+    if (module_exists('commerce_stripe_connect') && !empty($settings['use_connected_account']) && $settings['use_connected_account'] == 'site account') {
+      $connect_settings = commerce_stripe_connect_get_settings();
+      $settings['secret_key'] = $connect_settings['connected_secret_key'];
+      $settings['public_key'] = $connect_settings['connected_public_key'];
+    }
+
+    if (!isset($settings['secret_key']) || empty($settings['secret_key'])) {
+      drupal_set_message(t('Stripe secret and public key are required in order to use Stripe payment method. See README.txt for instructions.'), 'warning');
+      $link = l(t('configured here'), 'admin/commerce/config/payment-methods');
+      drupal_set_message(t('Settings required for the Stripe payment method can be !link.', array('!link' => $link)), 'warning');
+      return;
+    }
+
+    \Stripe\Stripe::setApiKey(trim($settings['secret_key']));
 
     // If configured to, set the API Version for all requests.
     // Because the default is the version configured in the Stripe
     // Account dashboard, we only set the version if something else
     // has been configured by an administrator.
-    $api_version = $payment_method['settings']['commerce_stripe_api_version'];
+    if (!isset($settings['commerce_stripe_api_version'])) {
+      $api_version = COMMERCE_STRIPE_API_LATEST_TESTED;
+    }
+    else {
+      $api_version = $settings['commerce_stripe_api_version'];
+    }
     if ($api_version <> COMMERCE_STRIPE_API_ACCOUNT_DEFAULT) {
       if ($api_version == COMMERCE_STRIPE_API_VERSION_CUSTOM) {
-        $api_version = check_plain($payment_method['settings']['commerce_stripe_api_version_custom']);
+        $api_version = check_plain($settings['commerce_stripe_api_version_custom']);
       }
 
       try {
@@ -195,6 +220,7 @@ function commerce_stripe_return_access($order, $transaction) {
  *   Settings form array
  */
 function commerce_stripe_settings_form($settings) {
+  $settings = (array) $settings + commerce_stripe_default_settings();
   $form = array();
   $currencies = commerce_currencies(TRUE);
   $currency_list = array();
@@ -207,26 +233,67 @@ function commerce_stripe_settings_form($settings) {
     }
   }
 
-  $form['stripe_currency'] = array(
-    '#type' => 'select',
-    '#title' => t('Currency'),
-    '#options' => $currency_list,
-    '#description' => t('Select the currency that you are using.'),
-    '#default_value' => !empty($settings['stripe_currency']) ? $settings['stripe_currency'] : 'USD',
-  );
   $form['secret_key'] = array(
     '#type' => 'textfield',
     '#title' => t('Secret Key'),
     '#description' => t('Secret API Key. Get your key from https://stripe.com/'),
-    '#default_value' => !empty($settings['secret_key']) ? $settings['secret_key'] : '',
+    '#default_value' => $settings['secret_key'],
     '#required' => TRUE,
   );
   $form['public_key'] = array(
     '#type' => 'textfield',
     '#title' => t('Publishable Key'),
     '#description' => t('Publishable API Key. Get your key from https://stripe.com/'),
-    '#default_value' => !empty($settings['public_key']) ? $settings['public_key'] : '',
+    '#default_value' => $settings['public_key'],
     '#required' => TRUE,
+  );
+
+  // If the site has the Commerce Stripe Connect submodule enabled and has
+  // connected to a site-wide Stripe Standard account, adjust the settings so
+  // that account's API keys can be used instead of directly inputted here.
+  if (module_exists('commerce_stripe_connect')) {
+    $connect_settings = commerce_stripe_connect_get_settings();
+    if (!empty($connect_settings['connected_account_id'])) {
+      // Add radio button options as first form element.
+      $form['use_connected_account'] = array(
+        '#type' => 'radios',
+        '#title' => t('API Credentials'),
+        '#options' => array(
+          'none' => t('Input API credentials for this payment method.'),
+          'site account' => t('Use the site-wide account identified via Stripe Connect.'),
+        ),
+        '#default_value' => $settings['use_connected_account'],
+        '#weight' => -10,
+      );
+
+      unset($form['secret_key']['#required']);
+      $form['secret_key']['#states'] = array(
+        'visible' => array(
+          ':input[name="parameter[payment_method][settings][payment_method][settings][use_connected_account]"]' => array('value' => 'none'),
+        ),
+        'required' => array(
+          ':input[name="parameter[payment_method][settings][payment_method][settings][use_connected_account]"]' => array('value' => 'none'),
+        ),
+      );
+
+      unset($form['public_key']['#required']);
+      $form['public_key']['#states'] = array(
+        'visible' => array(
+          ':input[name="parameter[payment_method][settings][payment_method][settings][use_connected_account]"]' => array('value' => 'none'),
+        ),
+        'required' => array(
+          ':input[name="parameter[payment_method][settings][payment_method][settings][use_connected_account]"]' => array('value' => 'none'),
+        ),
+      );
+    }
+  }
+
+  $form['stripe_currency'] = array(
+    '#type' => 'select',
+    '#title' => t('Currency'),
+    '#options' => $currency_list,
+    '#description' => t('Select the currency that you are using.'),
+    '#default_value' => !empty($settings['stripe_currency']) ? $settings['stripe_currency'] : 'USD',
   );
   $form['display_title'] = array(
     '#type' => 'textfield',
@@ -588,6 +655,10 @@ function commerce_stripe_submit_form_submit($payment_method, $pane_form, $pane_v
     $c['receipt_email'] = $order->mail;
   }
 
+  // Include the payment method settings array on the order object in a
+  // temporary field for use in the ensuing hooks.
+  $order->payment_method_settings = $payment_method['settings'];
+
   // The metadata could be added via the alter below but for compatibility
   // reasons it may stay.
   commerce_stripe_add_metadata($c, $order);
@@ -798,9 +869,6 @@ function _commerce_stripe_save_cardonfile($card, $uid, $payment_method, $set_def
 
 /**
  * Implements hook_commerce_payment_method_info_alter().
- *
- * Displays a warning if Stripe private and public keys are not set and the
- * user has permission to administer payment methods.
  */
 function commerce_stripe_commerce_payment_method_info_alter(&$payment_methods) {
   if (isset($payment_methods['commerce_stripe'])) {
@@ -850,29 +918,6 @@ function commerce_stripe_commerce_payment_method_info_alter(&$payment_methods) {
         'update callback' => 'commerce_stripe_cardonfile_update',
       );
     }
-
-    // Just return if they don't have permission to see these errors.
-    if (!user_access('administer payment methods')) {
-      return;
-    }
-    $found_errors = FALSE;
-    $settings = _commerce_stripe_load_settings();
-    // If secret_key or public_key is not set.
-    if (empty($settings['secret_key']) || empty($settings['public_key'])) {
-      $found_errors = TRUE;
-      drupal_set_message(t('Stripe secret and public key are required in order to use Stripe payment method. See README.txt for instructions.'), 'warning');
-    }
-    // If integration_type is not set.
-    if (empty($settings['integration_type'])) {
-      $found_errors = TRUE;
-      drupal_set_message(t('The Stripe payment method "Integration type" is not set. Stripe.js will be used by default.'), 'warning');
-    }
-    // If they need to configure anything, be nice and give them the link.
-    if ($found_errors) {
-      $link = l(t('configured here'), 'admin/commerce/config/payment-methods');
-      drupal_set_message(t('Settings required for the Stripe payment method can be !link.', array('!link' => $link)), 'warning');
-    }
-
   }
 }
 
@@ -893,6 +938,17 @@ function _commerce_stripe_load_settings($name = NULL) {
 
   if (isset($commerce_stripe_payment_method)) {
     $settings = $commerce_stripe_payment_method['settings'];
+
+    // If the site is using the Commerce Stripe Connect submodule and is configured
+    // to use the site-wide account public and secret keys, use those here.
+    if (module_exists('commerce_stripe_connect') &&
+      !empty($settings['use_connected_account']) &&
+      $settings['use_connected_account'] == 'site account') {
+
+      $connect_settings = commerce_stripe_connect_get_settings();
+      $settings['public_key'] = $connect_settings['connected_public_key'];
+      $settings['secret_key'] = $connect_settings['connected_secret_key'];
+    }
   }
 
   return $settings;
@@ -935,6 +991,10 @@ function commerce_stripe_cardonfile_charge($payment_method, $card_data, $order, 
     'capture' => $txn_capture_bool,
     'description' => $description,
   );
+
+  // Include the payment method settings array on the order object in a
+  // temporary field for use in the ensuing hooks.
+  $order->payment_method_settings = $payment_method['settings'];
 
   commerce_stripe_add_metadata($c, $order);
 
@@ -1629,6 +1689,12 @@ function _commerce_stripe_set_api_key($payment_method) {
   if (!empty($payment_method['settings']['secret_key'])) {
     Stripe\Stripe::setApiKey(trim($payment_method['settings']['secret_key']));
   }
+  elseif (!empty($payment_method['settings']['use_connected_account']) && $payment_method['settings']['use_connected_account'] == 'site account') {
+    if (module_exists('commerce_stripe_connect')) {
+      $connect_settings = commerce_stripe_connect_get_settings();
+      Stripe\Stripe::setApiKey(trim($connect_settings['connected_secret_key']));
+    }
+  }
 }
 
 /**
@@ -1642,12 +1708,14 @@ function commerce_stripe_payment_currencies() {
   $supported_currencies = array();
   $payment_method = commerce_payment_method_instance_load('commerce_stripe|commerce_payment_commerce_stripe');
 
-  if (!empty($payment_method['settings']['secret_key'])) {
+  if (!empty($payment_method['settings']['secret_key']) ||
+    (!empty($payment_method['settings']['use_connected_account']) && $payment_method['settings']['use_connected_account'] == 'site account')) {
     _commerce_stripe_set_api_key($payment_method);
     $info = \Stripe\Account::retrieve();
     $country_spec = \Stripe\CountrySpec::retrieve($info->country);
     $supported_currencies = $country_spec->supported_payment_currencies;
   }
+
   return $supported_currencies;
 }
 
@@ -1889,4 +1957,17 @@ function commerce_stripe_get_txn_message_success($txn_capture_bool) {
  */
 function commerce_stripe_get_txn_status($txn_capture_bool) {
   return ($txn_capture_bool) ? COMMERCE_PAYMENT_STATUS_SUCCESS : COMMERCE_PAYMENT_STATUS_PENDING;
+}
+
+/**
+ * Returns the default settings for the Stripe module.
+ */
+function commerce_stripe_default_settings() {
+  return array(
+    'secret_key' => '',
+    'public_key' => '',
+    'use_connected_account' => 'none',
+    'commerce_stripe_api_version' => COMMERCE_STRIPE_API_LATEST_TESTED,
+    'commerce_stripe_api_version_custom' => '',
+  );
 }

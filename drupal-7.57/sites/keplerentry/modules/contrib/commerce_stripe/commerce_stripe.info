@@ -9,9 +9,8 @@ dependencies[] = commerce_payment
 dependencies[] = commerce_order
 dependencies[] = libraries
 
-; Information added by Drupal.org packaging script on 2018-03-30
-version = "7.x-3.0-alpha3+7-dev"
+; Information added by Drupal.org packaging script on 2018-06-23
+version = "7.x-3.0-alpha3+18-dev"
 core = "7.x"
 project = "commerce_stripe"
-datestamp = "1522448590"
-
+datestamp = "1529742826"

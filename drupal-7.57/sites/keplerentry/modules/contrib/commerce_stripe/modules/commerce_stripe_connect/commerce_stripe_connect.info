@@ -1,7 +1,8 @@
+name = Commerce Stripe Connect
+description = Adds Stripe Connect support to the Commerce Stripe integration.
+package = Commerce (contrib)
 core = 7.x
-hidden = TRUE
-name = commerce_stripe_test
-description = Used during testing of commerce_stripe.
+dependencies[] = commerce_stripe
 
 ; Information added by Drupal.org packaging script on 2018-06-23
 version = "7.x-3.0-alpha3+18-dev"
