@@ -2053,3 +2053,22 @@ form#views-form-user-cart-mycart div#edit-actions {display:none;} /* Hide 'save'
 	entry management screens
 ===========================================================*/
 .view-event-entry-places-taken-summary caption {display:none;}
+
+/* IE 10 + 11 Message */
+div.tmd-IE-msg {display:none;}
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+  div.tmd-IE-msg {display:block;
+    width:100%;
+    background-color:#900;
+    border:solid 1px #000;
+    color:#fff;
+    font-size:40px;
+    }      /* Put your IE-only styles here. Works for IE 10 & IE 11*/
+  }
+  
+/**========================================================
+     User profile edit form - nb edits
+========================================================**/
+body.page-user-me-edit form#user-profile-form div#edit-profile-main-field-name-address div.name-block  {
+    display:none;
+}
