@@ -2,6 +2,37 @@
 /* Old blue = #0073e2 */
 /* ---------- Overall Specifications ---------- */
 
+/* Entry Status */
+.registration-keplerreg div.content a.button + div.field-label-inline div.field-items, /* Confirmed state */
+.registration-gruntreg div.content a.button + div.field-label-inline div.field-items,
+#registration-transitions-confirm-form + div.field-label-inline > div.field-items, /* Invited state */
+.field-name-field-year + div.field-label-inline div.field-items /* Walitlisted and reserved */
+{
+	color: #fff;
+	/* display: inline-block; */
+	padding: 5px 10px;
+	position: relative;
+	top: -5px;
+  -khtml-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+}
+.registration-keplerreg div.content a.button + div.field-label-inline div.field-items, /* Confirmed state */
+.registration-gruntreg div.content a.button + div.field-label-inline div.field-items
+{	background-color: #090; }
+
+#registration-transitions-confirm-form + div.field-label-inline > div.field-items /* Invited state */
+{ background-color: #Fa0; }
+#registration-transitions-confirm-form {display: inline-block;} /* move "accept invitation" button inline with title to match "withdraw" button */
+
+.field-name-field-year + div.field-label-inline div.field-items /* Walitlisted and reserved */
+{ background-color: #c50; }
+
+
+/* /Entry Status */
+
+
 body {
   line-height: 1.5;
   font-size: 87.5%;
@@ -1668,17 +1699,6 @@ padding: 8px;}/* new? */
 div.region-featured ul.menu li:hover {background-color: #0A86CD;}/* new? */
 .region-featured .block-menu li a {border-bottom: none;color:#fff;text-decoration:none;} /* line 368 */
 
-/* HIGHLIGHT "STATUS" ON ENTRIES */
-.registration-keplerreg div.field-label-inline:nth-of-type(6) div.field-label,
-.registration-gruntreg div.field-label-inline:nth-of-type(4) div.field-label
-{
-    color: #900;
-    font-size: 1.5em;
-    position: relative;
-    top: -8px;
-}
-
-
 .node-teaser h2 a::before {
 	content: url(/sites/keplerentry/themes/bartik/images/buy-icon.png);
 	padding-right: 10px;
@@ -1916,8 +1936,8 @@ ul.secondary {  /* line 100 of system.menus.css */
 
 /* Forms and page content */
 .field { /* {new} */
-    width: 48%; /* !! MAY WANT TO WIDEN THIS IF USE OF IFRAME DICTATES !! */
-    float: left;
+/* width: 48%; /* !! MAY WANT TO WIDEN THIS IF USE OF IFRAME DICTATES !!  === >
+float: left; === tmd Removed 20180719 as fewer items now shown in view */
     margin-right: 0.5em !important;/* not sure if this needs important */
     margin-bottom: 1em !important;/* not sure if this needs important */
 }
@@ -1950,12 +1970,12 @@ div.form-item.form-type-textfield.form-item-field-entryform-separator-text-und-0
     margin-bottom:1em;
 }
 	.registration-keplerreg::before, .registration-gruntreg::before { /* Message to display to runner already entered on forms. */
-    content: "You are currently entered or waitlisted for:";
+    content: "Your current entry:";
     font-size: 1.8em;
 }
-.registration-keplerreg div.content a.button, .registration-gruntreg div.content a.button { /* "withdraw" button spacing */
+/*.registration-keplerreg div.content a.button, .registration-gruntreg div.content a.button {  "withdraw" button spacing
     float: left;
-}
+}*/
 
 /* logged in state */
 .logged-in p.kepler-logged-in { /* {new} */
@@ -2000,11 +2020,20 @@ p.iframe-alert { /* New */
     margin-bottom:0;
 }
 
-/* My Entry screen of registration - hide extra info not required beside buttons  */
-div.entity-registration > div.content > div:first-of-type, div.entity-registration > div.content > div:nth-of-type(2) {
-	display: none;
-}
-.field.field-name-field-sponsor.field-type-text.field-label-hidden {
+/* My Entry screen of registration - relates to sponsor, year and event */
+
+/* div.entity-registration > div.content > div:first-of-type, div.entity-registration > div.content > div:nth-of-type(2) {
+	display: inline-block;
+} */
+div.entity-registration > div.content div.field-name-field-sponsor,
+div.entity-registration > div.content div.field-name-field-year,
+div.entity-registration > div.content div.field-name-field-event-title {display: inline-block;font-size: 20px;line-height: 1rem;}
+
+div.entity-registration > div.content div.field-name-field-year {margin-right: 30px !important;} /* add extra space before any buttons*/
+
+#content div.entity-registration > h2 {display: none;} /* Hide H2 title f event as it includes a confusing link */
+
+/* .field.field-name-field-sponsor.field-type-text.field-label-hidden {
 	clear: left;	width: auto;
 } /* re-aligns sponsor and event name */
 
@@ -2065,7 +2094,7 @@ div.tmd-IE-msg {display:none;}
     font-size:40px;
     }      /* Put your IE-only styles here. Works for IE 10 & IE 11*/
   }
-  
+
 /**========================================================
      User profile edit form - nb edits
 ========================================================**/
